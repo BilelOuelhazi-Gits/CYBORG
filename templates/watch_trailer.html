@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Watch Trailer</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo-cyborg-gaming.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/owl.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animate.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+    <style>
+        /* Position the video container */
+        #videoContainer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            text-align: center; /* Center the content */
+        }
+
+        /* Overlay for the timer */
+        #timerDisplay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* Initial style for the buttons (disabled state) */
+        #claimVideoRewardButton, #backToDashboardButton {
+            display: inline-block; /* Display buttons inline */
+            margin-top: 20px; /* Add space between the video and buttons */
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        /* Style for the buttons (enabled state) */
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #claimVideoRewardButton:disabled,
+        #backToDashboardButton:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    </style>
+    <script>
+        let timer;
+        let videoRewardClaimed = false;
+
+        function startTimer() {
+            const videoElement = document.getElementById('videoPlayer');
+            const claimVideoButton = document.getElementById('claimVideoRewardButton');
+            const backToDashboardButton = document.getElementById('backToDashboardButton');
+            const timerDisplay = document.getElementById('timerDisplay');
+
+            let timeRemaining = 5; // Start the timer from 5 seconds
+            videoElement.play();
+            videoElement.controls = false; // Disable video controls
+
+            // Update the timer every second
+            timer = setInterval(function () {
+                timeRemaining--;
+                timerDisplay.innerText = `Time remaining: ${timeRemaining} seconds`;
+
+                // Check if the timer reaches 0
+                if (timeRemaining <= 0 && !videoRewardClaimed) {
+                    clearInterval(timer); // Stop the timer
+                    claimVideoButton.style.opacity = 1; // Enable video reward button
+                    claimVideoButton.style.pointerEvents = 'auto'; // Enable button click
+                    claimVideoButton.style.cursor = 'pointer'; // Change cursor to show it's clickable
+                }
+            }, 1000);
+        }
+
+        function claimVideoReward() {
+            if (videoRewardClaimed) {
+                return;
+            }
+
+            videoRewardClaimed = true;
+            // Send request to claim video reward
+            fetch("/claim_video_reward", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('You have claimed 20 points for watching the video!');
+                    }
+                });
+
+            // Disable the "Claim Video Reward" button after claiming the reward
+            const claimVideoButton = document.getElementById('claimVideoRewardButton');
+            claimVideoButton.disabled = true;
+            claimVideoButton.style.opacity = 0.5;
+            claimVideoButton.style.pointerEvents = 'none';
+
+            // Show the "Back to Dashboard" button after claiming the video reward
+            const backToDashboardButton = document.getElementById('backToDashboardButton');
+            backToDashboardButton.style.opacity = 1;
+            backToDashboardButton.style.pointerEvents = 'auto';
+            backToDashboardButton.style.cursor = 'pointer';
+        }
+    </script>
+</head>
+
+<body onload="startTimer()">
+
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="index.html" class="logo">
+                            <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="">
+                        </a>
+                        <div class="search-input">
+                            <form id="search" action="#">
+                                <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" onkeypress="handle" />
+                                <i class="fa fa-search"></i>
+                            </form>
+                        </div>
+                        <ul class="nav">
+                            <li><a href="index.html" class="active">Home</a></li>
+                            <li><a href="browse.html">Browse</a></li>
+                            <li><a href="details.html">Details</a></li>
+                            <li><a href="streams.html">Streams</a></li>
+                            <li><a href="profile.html">Profile <img src="assets/images/profile-header.jpg" alt=""></a></li>
+                        </ul>
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+
+    <!-- Video container with overlay for timer -->
+    <div id="videoContainer">
+        <video id="videoPlayer" width="600" autoplay>
+            <source src="{{ trailer['video_url'] }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Timer overlay -->
+        <div id="timerDisplay">Time remaining: 5 seconds</div>
+
+        <!-- Claim video reward button (initially disabled) -->
+        <button id="claimVideoRewardButton" onclick="claimVideoReward()">Claim Video Reward</button>
+
+        <!-- Back to Dashboard button (initially disabled) -->
+        <button id="backToDashboardButton" onclick="window.location.href='{{ url_for('user_dashboard') }}'">Back to Dashboard</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/isotope.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/owl-carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/popup.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+
+</body>
+
+</html>

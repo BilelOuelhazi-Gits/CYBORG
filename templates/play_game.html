@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ game.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo-cyborg-gaming.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/owl.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animate.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+
+    <style>
+        /* Game container */
+        #gameContainer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1000px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Timer overlay */
+        #timerDisplay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 2;
+        }
+
+        /* Disabled button styles */
+        #claimRewardButton, #backToDashboardButton {
+            display: inline-block;
+            margin-top: 20px;
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        /* Enabled button styles */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #backToDashboardButton {
+            margin-top: 10px;
+        }
+
+        /* Title and description styling */
+        h2, p {
+            color: white;
+        }
+
+        /* Mobile-friendly */
+        @media (max-width: 768px) {
+            #gameContainer {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        let timer;
+        let rewardClaimed = false;
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const rewardButton = document.getElementById('claimRewardButton');
+
+            let timeRemaining = 10;
+
+            timerDisplay.innerText = `Time remaining: ${timeRemaining} seconds`;
+
+            timer = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.innerText = `Time remaining: ${timeRemaining} seconds`;
+
+                if (timeRemaining <= 0 && !rewardClaimed) {
+                    clearInterval(timer);
+                    rewardButton.style.opacity = 1;
+                    rewardButton.style.pointerEvents = 'auto';
+                    rewardButton.style.cursor = 'pointer';
+                }
+            }, 1000);
+        }
+
+        function claimReward(event) {
+            event.preventDefault(); // Prevent page refresh
+
+            if (rewardClaimed) return;
+
+            rewardClaimed = true;
+            document.getElementById('claimRewardButton').style.display = 'none';
+
+            fetch("/claim_play_reward", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('You have claimed 30 points!');
+                    }
+                });
+
+            const backToDashboardButton = document.getElementById('backToDashboardButton');
+            backToDashboardButton.style.opacity = 1;
+            backToDashboardButton.style.pointerEvents = 'auto';
+            backToDashboardButton.style.cursor = 'pointer';
+        }
+    </script>
+</head>
+
+<body onload="startTimer()">
+
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="{{ url_for('user_dashboard') }}" class="logo">
+                            <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="">
+                        </a>
+                        <ul class="nav">
+                            <li><a href="{{ url_for('user_dashboard') }}" class="active">Home</a></li>
+                            <li><a href="#">Browse</a></li>
+                            <li><a href="#">Details</a></li>
+                            <li><a href="#">Streams</a></li>
+                            <li><a href="#">Profile <img src="{{ url_for('static', filename='assets/images/profile-header.jpg') }}" alt=""></a></li>
+                        </ul>
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <div id="gameContainer">
+
+        <!-- Timer -->
+        <div id="timerDisplay">Time remaining: 10 seconds</div>
+
+        <!-- Game Embed -->
+        <div>{{ game.game_url | safe }}</div>
+
+        <!-- Claim Reward Button -->
+        <button id="claimRewardButton" onclick="claimReward(event)">Claim Reward</button>
+
+        <!-- Back to Dashboard Button -->
+        <button id="backToDashboardButton" onclick="window.location.href='{{ url_for('user_dashboard') }}'">Back to Dashboard</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/isotope.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/owl-carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/popup.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+
+</body>
+
+</html>

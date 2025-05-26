@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Cyborg</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <!-- Additional CSS Files -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/fontawesome.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo-cyborg-gaming.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/owl.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animate.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+  <script>
+    function copyReferralLink() {
+        var copyText = document.getElementById("referralLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand("copy");
+        alert("Referral link copied to clipboard: " + copyText.value);
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- ***** Preloader Start ***** -->
+  <div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+      <span class="dot"></span>
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <!-- ***** Preloader End ***** -->
+
+  <!-- ***** Header Area Start ***** -->
+  <header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="index.html" class="logo">
+  <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="Logo">
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <div class="search-input">
+                      <form id="search" action="#">
+                        <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" onkeypress="handle" />
+                        <i class="fa fa-search"></i>
+                      </form>
+                    </div>
+                    <!-- ***** Menu Start ***** -->
+
+                    <ul class="nav">
+                        <li><a href="index.html" class="active">Home</a></li>
+                        <li><a href="browse.html">Browse</a></li>
+                        <li><a href="details.html">Your Points: {{ current_user.points }}</a></li>
+
+                        <li><a href="">{{ current_user.username }} </a></li>
+                    </ul>
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+  </header>
+  <!-- ***** Header Area End ***** -->
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="page-content">
+
+          <!-- ***** Banner Start ***** -->
+          <div class="main-banner">
+            <div class="row">
+              <div class="col-lg-7">
+                <div class="header-text">
+                  <h6>Welcome To Cyborg</h6>
+                  <h4><em>Watch, Play, Earn</em> Your Fun Just Became Rewarding!</h4>
+                  <div class="main-button">
+                                  <a id="claimRewardBtn">Claim Daily Reward</a>
+                  </div>
+                    <div id="rewardMessage" style="color: white;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- ***** Banner End ***** -->
+
+<div class="d-flex justify-content-center mt-4">
+  <div class="input-group" style="max-width: 600px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); border-radius: 12px; overflow: hidden;">
+    <input
+      type="text"
+      id="referralLink"
+      class="form-control"
+      value="{{ referral_link }}"
+      readonly
+      style="background-color: #2a2a2a; color: #fff; border: none; padding: 12px 16px; font-size: 16px;">
+    <div class="input-group-append">
+      <button
+        class="btn"
+        type="button"
+        onclick="copyReferralLink()"
+        style="background-color: #e85c8c; color: white; padding: 12px 20px; font-weight: bold; border: none; transition: 0.3s; box-shadow: 0 0 8px rgba(232, 92, 140, 0.8);">
+        Copy Link
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Optional message -->
+<div id="copyMessage" style="text-align: center; color: #e85c8c; margin-top: 10px; display: none;">
+  Link copied to clipboard!
+</div>
+
+
+<script>
+  function copyReferralLink() {
+    const linkInput = document.getElementById("referralLink");
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // For mobile
+    document.execCommand("copy");
+
+    const message = document.getElementById("copyMessage");
+    message.style.display = "block";
+    setTimeout(() => {
+      message.style.display = "none";
+    }, 2000);
+  }
+</script>
+
+<!-- ***** Most Popular Start ***** -->
+<div class="most-popular">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="heading-section">
+        <h4><em>Most Watched Trailers</em> Right Now</h4>
+      </div>
+      <div class="row">
+        {% for trailer in trailers %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <a href="{{ url_for('watch_trailer', trailer_id=trailer['_id']) }}">
+              {% if trailer.image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ trailer.image) }}" alt="{{ trailer.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 10px 10px 0 0;">
+              {% endif %}
+              <h4 style="padding: 10px;">{{ trailer['title'] }}<br><span>20 Points</span></h4>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+          <!-- ***** Most Popular End ***** -->
+
+<!-- ***** Gaming Library Start ***** -->
+<div class="gaming-library">
+  <div class="col-lg-12">
+    <div class="heading-section">
+      <h4><em>Your Gaming</em> Library</h4>
+    </div>
+
+    {% for game in games %}
+    <div class="item">
+      <ul style="display: flex; justify-content: space-between; align-items: center;">
+        <li style="flex-grow: 1; display: flex; align-items: center;">
+          {% if game.image %}
+            <img src="{{ url_for('static', filename='uploads/' ~ game.image) }}" alt="{{ game.title }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 10px;">
+          {% endif %}
+          <div>
+            <h4>{{ game.title }}</h4>
+            <span>ID: {{ game._id }}</span>
+          </div>
+        </li>
+        <li>
+          <div class="main-border-button border-no-active">
+            <a href="{{ url_for('play_game', game_id=game._id) }}" class="game-play-btn">Play Game</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+
+
+
+<div class="most-popular py-5">
+  <div class="col-lg-12">
+    <div class="heading-section">
+      <h4><em>Available</em> Gift Cards</h4>
+    </div>
+    <div class="row">
+      {% for giftcard in giftcards %}
+      <div class="col-lg-4 col-sm-6 mb-4">
+        <div class="item text-center">
+          <h4>{{ giftcard.name }}<br><span>{{ giftcard.cost }} Points</span></h4>
+          <form method="POST" action="{{ url_for('buy_giftcard', giftcard_id=giftcard._id) }}">
+            <div class="main-border-button mt-3">
+              <button type="submit" class="buy-button">
+                Buy
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-lg-12">
+        <p>No gift cards available right now.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="gaming-library py-5">
+  <div class="col-lg-12">
+    <div class="heading-section">
+      <h4><em>Your Purchased</em> Gift Cards</h4>
+    </div>
+    <div class="row">
+      {% for card in purchased_giftcards %}
+      <div class="col-lg-4 col-sm-6 mb-4">
+        <div class="item text-center">
+          <h4>{{ card.name }}</h4>
+          <span><code>{{ card.code }}</code></span><br>
+          <small class="text-muted">Purchased at: {{ card.claimed_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-lg-12">
+        <p>You haven't purchased any gift cards yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+  .buy-button {
+    color: white !important;
+    background-color: #e85c8c;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    box-shadow: 0 0 8px rgba(232, 92, 140, 0.8);
+  }
+
+  .buy-button:hover {
+    background-color: #ff3366;
+    transform: scale(1.05);
+  }
+
+  .logout-button {
+    display: inline-block;
+    color: #fff;
+    background-color: #e85c8c;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 0 8px rgba(232, 92, 140, 0.8);
+  }
+
+  .logout-button:hover {
+    background-color: #ff3366;
+    transform: scale(1.05);
+  }
+
+  .main-border-button {
+    text-align: center;
+  }
+
+  .game-play-btn {
+    display: inline-block;
+    color: white;
+    background-color: #4caf50;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s ease;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+  }
+
+  .game-play-btn:hover {
+    background-color: #388e3c;
+    transform: scale(1.05);
+  }
+</style>
+
+              <!-- Logout Button -->
+<div class="main-border-button border-no-active mt-3">
+  <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+</div>
+
+<!-- Scripts -->
+  <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/isotope.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/owl-carousel.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/tabs.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/popup.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+
+  <script>
+    const claimBtn = document.getElementById("claimRewardBtn");
+    const messageDiv = document.getElementById("rewardMessage");
+    const canClaim = {{ 'true' if can_claim else 'false' }};
+
+    if (!canClaim) {
+      claimBtn.disabled = true;
+      messageDiv.innerText = "You’ve already claimed today’s reward. Come back tomorrow!";
+    }
+
+    claimBtn.addEventListener("click", async () => {
+      const response = await fetch("/claim_reward", { method: "POST" });
+      const data = await response.json();
+
+      if (data.success) {
+        window.location.reload();
+      } else {
+        messageDiv.innerText = data.message;
+      }
+    });
+  </script>
+
+</body>
+
+</html>
